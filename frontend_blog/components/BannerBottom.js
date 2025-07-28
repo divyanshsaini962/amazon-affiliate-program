@@ -4,8 +4,8 @@ import Image from "next/image";
 import tv from "@/public/telivision.jpg";
 import earphones from "@/public/earphone.jpg";
 import pantry from "@/public/Vim.jpg";
-import luggage from "@/public/luggage.jpg";
-import electronics from "@/public/electronics.jpg";
+import luggage from "@/public/Luggage.jpg"; // Fixed: capital L
+import electronics from "@/public/Electronics.jpg"; // Fixed: capital E
 import womensClothing from "@/public/Woman.jpg";
 import homeAppliances from "@/public/Ac.jpg";
 import mensClothing from "@/public/mens.jpg";
