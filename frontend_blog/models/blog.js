@@ -9,6 +9,7 @@ const BlogSchema = new Schema({
     blogcategory:[{type:String}],//markdown content
     tags:[{type:String}],
     status:{type:String},
+    amazonLink: { type: String }, // Added to match backend
 },
     { timestamps:true}  // this option will automatically manage createdat   abd updatedat fields
 );

@@ -6,14 +6,13 @@ import useFetchData from "@/hooks/useFetchData";
 import MenImage from "@/public/carousel1.jpg";
 import NoImg from "@/public/noimage.jpg";
 import Author2 from "@/public/carousel3.jpg";
-import AuthorI from "@/public/ashish.jpg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import secondimg from "../public/carousel2.jpg";
 import BannerBottom from "@/components/BannerBottom";
-import DealCard from "../components/DealCard";
-import DailyDealsSection from "@/components/DailyDealsSection";
+// import DealCard from "../components/DealCard";
+// import DailyDealsSection from "@/components/DailyDealsSection";
 
 
 export default function Home() {
@@ -155,70 +154,7 @@ export default function Home() {
         <div className="bannerb">
           <BannerBottom />
         </div>
-        {/* <section
-          className="deals_section"
-          style={{
-            background: "#e9ecf8",
-            padding: "2.5rem 0",
-            margin: "0",
-            width: "100vw",
-            position: "relative",
-            left: "50%",
-            right: "50%",
-            marginLeft: "-50vw",
-            marginRight: "-50vw",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "900px",
-              margin: "0 auto",
-              padding: "0 1rem",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem" }}>
-              <h2 style={{ fontSize: "2rem", fontWeight: 700, margin: 0 }}>Latest Deals</h2>
-            </div>
-            <DealCard
-              image="/latest%20deal.jpg"
-              title="atomberg Efficio Alpha 1200mm BLDC Ceiling Fan with Remote | 5 star | High Air Delivery | LED Speed Indicator | Low Noise | Timeless Design with Power Saving | 2 Years Warranty (Seasand Ivory)"
-              oldPrice="Rs. 4590"
-              newPrice="Rs. 2699"
-              discount="41%"
-              timeAgo="10 hrs ago"
-            />
-            <div style={{ textAlign: "center", marginTop: "2rem" }}>
-              <a
-                href="/deals"
-                style={{
-                  background: "linear-gradient(135deg, #3498db 0%, #2980b9 100%)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "25px",
-                  padding: "1rem 2.5rem",
-                  fontWeight: 600,
-                  fontSize: "1.1rem",
-                  textDecoration: "none",
-                  boxShadow: "0 4px 16px rgba(52,152,219,0.3)",
-                  transition: "all 0.3s ease",
-                  display: "inline-block",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow = "0 6px 20px rgba(52,152,219,0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "0 4px 16px rgba(52,152,219,0.3)";
-                }}
-              >
-                🛒 View All Deals
-              </a>
-            </div>
-          </div>
-        </section> */}
-        <DailyDealsSection />
+        {/* blog card */}
         <section className="main_blog_section" aria-label="Recent blog posts">
           <h2 id="hadding">Recently Published</h2>
           <div className="leftblog_sec">
@@ -257,22 +193,10 @@ export default function Home() {
                       </Link>
                       <div className="blog-buttons" style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.75rem" }}>
                         <a
-                          href="https://www.amazon.in/"
+                          href={blog.amazonLink || "https://www.amazon.in/"}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="buy-btn"
-                          style={{
-                            background: "#ffc107",
-                            color: "#222",
-                            padding: "0.7rem 1.5rem",
-                            borderRadius: "8px",
-                            fontWeight: 600,
-                            textDecoration: "none",
-                            transition: "background 0.2s",
-                            flex: "1 1 180px",
-                            textAlign: "center",
-                            margin: "0 0.25rem 0.5rem 0.25rem",
-                          }}
+                          className="buy-btn-amazon"
                         >
                           Buy on Amazon
                         </a>

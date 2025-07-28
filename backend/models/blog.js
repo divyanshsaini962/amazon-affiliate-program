@@ -9,7 +9,8 @@ const BlogSchema = new Schema({
     blogcategory:[{type:String}],
     tags:[{type:String}],
     status: { type: String },
-    mainImage: { type: String }
+    mainImage: { type: String },
+    amazonLink: { type: String },
 },
     { timestamps:true}  // this option will automatically manage createdat   abd updatedat fields
 );

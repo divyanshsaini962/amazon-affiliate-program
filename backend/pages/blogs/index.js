@@ -16,7 +16,7 @@ export default function blogs() {
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   // you can change how much blog you want on every page
-  const [perPage] = useState(6);
+  const [perPage] = useState(10);
 
 
   // fetch blogs form api endpoint with hooks

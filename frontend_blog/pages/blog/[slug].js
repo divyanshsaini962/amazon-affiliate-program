@@ -73,9 +73,36 @@ export default function BlogPage() {
         img.src = img.src.replace(/^http:\/\/localhost:\d+/, '');
       }
     }
+
+    // Convert <a> with 'Buy on Amazon' text to a button
+    const links = doc.getElementsByTagName('a');
+    for (let link of Array.from(links)) {
+      if (link.textContent.trim().toLowerCase() === 'buy on amazon') {
+        const button = doc.createElement('button');
+        button.textContent = link.textContent;
+        button.setAttribute('type', 'button');
+        button.setAttribute('class', 'amazon-buy-btn');
+        button.setAttribute('data-href', link.href);
+        link.parentNode.replaceChild(button, link);
+      }
+    }
     
     return doc.body.innerHTML;
   };
+
+  useEffect(() => {
+    // Event delegation for Amazon buy buttons
+    const handler = (e) => {
+      if (e.target && e.target.classList.contains('amazon-buy-btn')) {
+        const url = e.target.getAttribute('data-href');
+        if (url) {
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
   return (
     <>

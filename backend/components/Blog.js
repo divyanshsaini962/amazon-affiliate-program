@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { useState, useMemo, forwardRef, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
+import React from "react";
 
 const ReactQuill = dynamic(
   async () => {
@@ -60,6 +61,28 @@ const QuillWrapper = forwardRef((props, ref) => {
 
 QuillWrapper.displayName = 'QuillWrapper';
 
+const TiptapEditor = dynamic(() => import("./TiptapEditor"), { ssr: false });
+
+// ErrorBoundary to catch editor errors
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    // You can log errorInfo here if needed
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{ color: 'red', padding: '1em' }}>Something went wrong in the editor: {this.state.error?.message || 'Unknown error'}</div>;
+    }
+    return this.props.children;
+  }
+}
+
 export default function Blog({
   _id,
   title: existingTitle,
@@ -70,8 +93,10 @@ export default function Blog({
   tags: existingTags,
   status: existingStatus,
   mainImage: existingMainImage,
+  amazonLink: existingAmazonLink,
 }) {
   const [redirect, setRedirect] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
   const quillRef = useRef();
 
@@ -83,6 +108,28 @@ export default function Blog({
   const [tags, setTags] = useState(existingTags || []);
   const [status, setStatus] = useState(existingStatus || "");
   const [mainImage, setMainImage] = useState(existingMainImage || "");
+  const [amazonLink, setAmazonLink] = useState(existingAmazonLink || "");
+
+  // Slugify function to generate a URL-friendly slug from the title
+  function slugify(text) {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^a-z0-9-]/g, '') // Remove all non-alphanumeric chars except -
+      .replace(/--+/g, '-') // Replace multiple - with single -
+      .replace(/^-+|-+$/g, ''); // Trim - from start/end
+  }
+
+  // Automatically update slug when title changes
+  React.useEffect(() => {
+    if (title) {
+      setSlug(slugify(title));
+    } else {
+      setSlug("");
+    }
+  }, [title]);
 
   async function createProduct(ev) {
     ev.preventDefault();
@@ -95,6 +142,7 @@ export default function Blog({
       tags,
       status,
       mainImage,
+      amazonLink,
     };
     try {
       if (_id) {
@@ -102,7 +150,10 @@ export default function Blog({
       } else {
         await axios.post("/api/blogapi", data);
       }
-      setRedirect(true);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setRedirect(true);
+      }, 60000); // 1 minute
     } catch (error) {
       console.error("Error saving blog post:", error);
     }
@@ -111,6 +162,49 @@ export default function Blog({
   if (redirect) {
     router.push("/");
     return null;
+  }
+
+  if (showSuccess) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '60vh',
+        background: '#f7faff',
+        borderRadius: '16px',
+        boxShadow: '0 2px 16px rgba(42,60,255,0.07)',
+        padding: '48px 24px',
+        margin: '40px auto',
+        maxWidth: '500px',
+      }}>
+        <div style={{ fontSize: '3rem', color: '#2a3cff', marginBottom: '16px' }}>🎉</div>
+        <h2 style={{ color: '#2a3cff', marginBottom: '12px' }}>Blog Published Successfully!</h2>
+        <p style={{ color: '#333', fontSize: '1.1rem', marginBottom: '8px' }}>
+          Your blog has been published and is now live.
+        </p>
+        <p style={{ color: '#666', fontSize: '1rem' }}>
+          You will be redirected to the blog page in <b>1 minute</b>.
+        </p>
+        <button
+          style={{
+            marginTop: '24px',
+            background: '#2a3cff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px 24px',
+            fontSize: '1rem',
+            cursor: 'pointer',
+            boxShadow: '0 1px 4px rgba(42,60,255,0.08)',
+          }}
+          onClick={() => setRedirect(true)}
+        >
+          Go to Blog Page Now
+        </button>
+      </div>
+    );
   }
 
   const handleSlugChange = (ev) => {
@@ -129,12 +223,7 @@ export default function Blog({
   };
 
   const handleImageUrlInput = (url) => {
-    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-    if (urlPattern.test(url)) {
-      setMainImage(url);
-    } else {
-      console.error("Invalid image URL:", url);
-    }
+    setMainImage(url);
   };
 
   const imageHandler = useCallback(() => {
@@ -171,12 +260,7 @@ export default function Blog({
   const handleImageUrl = () => {
     const url = prompt('Enter the image URL:');
     if (url && quillRef.current) {
-      const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-      if (urlPattern.test(url)) {
-        insertToEditor(url);
-      } else {
-        console.error('Invalid image URL:', url);
-      }
+      insertToEditor(url);
     }
   };
 
@@ -254,9 +338,10 @@ export default function Blog({
           type="text"
           id="slug"
           value={slug}
-          onChange={handleSlugChange}
+          onChange={e => setSlug(slugify(e.target.value))}
           placeholder="Enter slug url"
           required
+          readOnly
         />
       </div>
       <div className="w-100 flex flex-col flex-left mb-2" data-aos="fade-up">
@@ -272,29 +357,49 @@ export default function Blog({
             )
           }
         >
-          <option value="mobilecomputer">Mobile & Computer</option>
-          <option value="tvappliance">TV,Appliances&Electronics</option>
-          <option value="mensfashion">Men's Fashion</option>
-          <option value="fashion">Women's Fashion</option>
-          <option value="others">Other's</option>
+          <option value="best-products">Best Products</option>
+          <option value="earphones">Earphones</option>
+          <option value="pantry">Pantry</option>
+          <option value="luggage">Luggage</option>
+          <option value="electronics">Electronics</option>
+          <option value="womens-clothing">Women's Clothing</option>
+          <option value="home-appliances">Home Appliances</option>
+          <option value="mens-clothing">Men's Clothing</option>
         </select>
-        <p className="existingcategory flex gap-1 mt-1 mb-1">
-          selected:{" "}
-          {Array.isArray(blogcategory) &&
+        <div className="selected-labels flex gap-1 mt-1 mb-1">
+          {Array.isArray(blogcategory) && blogcategory.length > 0 ? (
             blogcategory.map((category) => (
-              <span key={category}>{category}</span>
-            ))}
-        </p>
+              <span key={category} style={{
+                background: '#e3e8ff',
+                color: '#2a3cff',
+                borderRadius: '12px',
+                padding: '2px 10px',
+                fontSize: '0.95em',
+                marginRight: '4px',
+                display: 'inline-block',
+              }}>{category}</span>
+            ))
+          ) : (
+            <span style={{ color: '#888' }}>No category selected</span>
+          )}
+        </div>
       </div>
-      <div className="body w-100 flex flex-col flex-left mb-2">
-        <label htmlFor="body">Blog Content</label>
-        <QuillWrapper
-          ref={quillRef}
-          value={body}
-          onChange={setBody}
-          modules={modules}
-          style={{ height: "400px", width: "1200px" }}
+      {/* Amazon Link input */}
+      <div className="w-100 flex flex-col flex-left mb-2" data-aos="fade-up">
+        <label htmlFor="amazonLink">Amazon Link</label>
+        <input
+          type="text"
+          id="amazonLink"
+          value={amazonLink}
+          onChange={(e) => setAmazonLink(e.target.value)}
+          placeholder="Enter Amazon product URL (optional)"
         />
+      </div>
+      <div className="body w-100 flex flex-col flex-left mb-2" style={{width: '100%', maxWidth: '1200px', margin: '0 auto'}}>
+        <label htmlFor="body">Blog Content</label>
+        <ErrorBoundary>
+          <TiptapEditor value={body} onChange={setBody} />
+        </ErrorBoundary>
       </div>
       <div className="w-100 flex flex-col flex-left mb-2" data-aos="fade-up">
         <label htmlFor="tags">Tags</label>
@@ -325,11 +430,23 @@ export default function Blog({
           <option value="productivity">Productivity</option>
           <option value="security">Security</option>
         </select>
-        <p className="existingcategory flex gap-1 mt-1 mb-1">
-          selected:
-          {Array.isArray(tags) &&
-            tags.map((tag) => <span key={tag}>{tag}</span>)}
-        </p>
+        <div className="selected-labels flex gap-1 mt-1 mb-1">
+          {Array.isArray(tags) && tags.length > 0 ? (
+            tags.map((tag) => (
+              <span key={tag} style={{
+                background: '#e3e8ff',
+                color: '#2a3cff',
+                borderRadius: '12px',
+                padding: '2px 10px',
+                fontSize: '0.95em',
+                marginRight: '4px',
+                display: 'inline-block',
+              }}>{tag}</span>
+            ))
+          ) : (
+            <span style={{ color: '#888' }}>No tag selected</span>
+          )}
+        </div>
       </div>
       <div className="w-100 flex flex-col flex-left mb-2">
         <label htmlFor="status">Status</label>

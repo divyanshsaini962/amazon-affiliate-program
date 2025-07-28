@@ -2,24 +2,20 @@ import Blog from "@/components/Blog";
 import Loading from "@/components/Loading";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 
 export default function Addblog() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (status !== "loading") {
-      setIsLoading(false);
-      if (!session) {
-        router.push('/login');
-      }
+    if (status === "unauthenticated") {
+      router.push('/login');
     }
-  }, [session, status, router]);
+  }, [status, router]);
 
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="loadingdata flex flex-col flex-center wh_100">
         <Loading />
@@ -28,8 +24,8 @@ export default function Addblog() {
     );
   }
 
-  if (!session) {
-    return null; // or a message saying "Redirecting to login..."
+  if (status === "unauthenticated") {
+    return <div>Redirecting to login...</div>;
   }
 
   return (

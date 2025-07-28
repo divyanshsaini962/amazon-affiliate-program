@@ -9,9 +9,9 @@ export default async function handle(req,res){
     const {method} = req;
 //data send or post
     if(method === 'POST'){
-        const {title,description,slug,body,blogcategory,tags,status,mainImage} = req.body;
+        const {title,description,slug,body,blogcategory,tags,status,mainImage,amazonLink} = req.body;
         const blogDoc = await Blog.create({
-            title,description, slug, body, blogcategory, tags, status, mainImage
+            title, description, slug, body, blogcategory, tags, status, mainImage, amazonLink
         });
         res.json(blogDoc);
     }
@@ -25,9 +25,9 @@ export default async function handle(req,res){
         }
     }
     if(method === 'PUT'){
-        const {_id,title,description,slug,body,blogcategory,tags,status,mainImage} = req.body;
+        const {_id, title, description, slug, body, blogcategory, tags, status, mainImage, amazonLink} = req.body;
         await Blog.updateOne({ _id }, {
-            title,description, slug, body, blogcategory, tags, status, mainImage
+            title, description, slug, body, blogcategory, tags, status, mainImage, amazonLink
         }, { new: true });
         res.json(true)
     }

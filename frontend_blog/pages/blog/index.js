@@ -99,47 +99,110 @@ export default function Home() {
         <section className="main_blog_section" aria-label="Recent blog posts">
           <h2 id="hadding">Recently Published</h2>
           <div className="leftblog_sec">
-            <div className="blogs_sec">
+            <div className="blogs_sec" style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '2rem',
+              justifyContent: 'center',
+            }}>
               {loading ? (
                 <div className="wh_100 flex flex-center mt-2 pb-5">
                   <div className="loader" aria-label="Loading content"></div>
                 </div>
               ) : currentBlogs.length > 0 ? (
                 currentBlogs.map((blog, index) => (
-                  <article className="blog" key={blog._id}>
-                    <div className="blogs">
-                      <div className="blogimg">
+                  <article className="blog" key={blog._id} style={{
+                    background: '#fff',
+                    borderRadius: '16px',
+                    boxShadow: '0 2px 16px rgba(42,60,255,0.07)',
+                    maxWidth: '350px',
+                    width: '100%',
+                    margin: '0 auto',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: '420px',
+                  }}>
+                    <Link href={`/blog/${blog.slug}`}>
+                      <Image
+                        src={blog.mainImage || NoImg}
+                        alt={`Featured image for ${blog.title}`}
+                        width={350}
+                        height={200}
+                        style={{ objectFit: 'cover', width: '100%', height: '200px' }}
+                        priority={index === 0}
+                      />
+                    </Link>
+                    <div className="bloginfo" style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <div>
+                        {blog.tags && blog.tags.length > 0 && blog.tags[0] && (
+                          <Link href={`/tag/${blog.tags[0]}`}>
+                            <div className="blogtag" style={{
+                              display: 'inline-block',
+                              background: '#e3e8ff',
+                              color: '#2a3cff',
+                              borderRadius: '12px',
+                              padding: '2px 10px',
+                              fontSize: '0.95em',
+                              marginBottom: '8px',
+                            }}>{blog.tags[0]}</div>
+                          </Link>
+                        )}
                         <Link href={`/blog/${blog.slug}`}>
-                          <Image
-                            src={blog.mainImage || NoImg}
-                            alt={`Featured image for ${blog.title}`}
-                            width={300}
-                            height={200}
-                            style={{ objectFit: 'cover' }}
-                            priority={index === 0}
-                          />
+                          <h3 className="blog-title" style={{ margin: '8px 0 12px 0', color: '#222', fontWeight: 700, fontSize: '1.3rem' }}>
+                            {blog.title.length > 50
+                              ? blog.title.substring(0, 50) + '...'
+                              : blog.title}
+                          </h3>
                         </Link>
-                      </div>
-                    </div>
-
-                    <div className="bloginfo">
-                      <Link href={`/tag/${blog.tags[0]}`}>
-                        <div className="blogtag">{blog.tags[0]}</div>
-                      </Link>
-                      <Link href={`/blog/${blog.slug}`}>
-                        <h3 className="blog-title">
-                          {blog.title.length > 50
-                            ? blog.title.substring(0, 50) + "..."
-                            : blog.title}
-                        </h3>
-                      </Link>
-                      <p className="blog-description">
-                      {blog.description.length > 50
-                            ? blog.description.substring(0, 70) + "..."
+                        <p className="blog-description" style={{ color: '#444', fontSize: '1.05rem', marginBottom: '16px' }}>
+                          {blog.description.length > 70
+                            ? blog.description.substring(0, 70) + '...'
                             : blog.description}
-                      </p>
-
-                      <div className="blogauthor flex gap-1">
+                        </p>
+                        <div className="blog-buttons" style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.75rem" }}>
+                          <a
+                            href={blog.amazonLink || "https://www.amazon.in/"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="buy-btn-amazon"
+                            style={{
+                              background: "#ff9900",
+                              color: "#fff",
+                              padding: "0.7rem 1.5rem",
+                              borderRadius: "8px",
+                              fontWeight: 600,
+                              textDecoration: "none",
+                              transition: "background 0.2s",
+                              flex: "1 1 180px",
+                              textAlign: "center",
+                              margin: "0 0.25rem 0.5rem 0.25rem",
+                            }}
+                          >
+                            Buy on Amazon
+                          </a>
+                          <Link href={`/blog/${blog.slug}`} legacyBehavior>
+                            <a
+                              className="view-details-btn"
+                              style={{
+                                background: "#4f8cff",
+                                color: "#fff",
+                                padding: "0.7rem 1.5rem",
+                                borderRadius: "8px",
+                                fontWeight: 600,
+                                textDecoration: "none",
+                                transition: "background 0.2s",
+                                flex: "1 1 180px",
+                                textAlign: "center",
+                                margin: "0 0.25rem 0.5rem 0.25rem",
+                              }}
+                            >
+                              View Details
+                            </a>
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="blogauthor flex gap-1" style={{ alignItems: 'center' }}>
                         <div className="blogaimg">
                           <Image
                             src={AuthorI}
@@ -153,8 +216,8 @@ export default function Home() {
                           />
                         </div>
                         <div className="flex flex-col flex-left gap-05">
-                          <h4>Divyanshu Saini</h4>
-                          <span>
+                          <h4 style={{ margin: 0, color: '#2a3cff', fontWeight: 600 }}>Divyanshu Saini</h4>
+                          <span style={{ color: '#888', fontSize: '0.95em' }}>
                             {new Date(blog.createAt).toLocaleDateString(
                               "en-Us",
                               {
